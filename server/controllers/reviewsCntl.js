@@ -1,5 +1,9 @@
+/* eslint-disable no-use-before-define */
 const axios = require('axios')
 // const reviewsModel = require('../models/reviewsModel')
+const jsdom = require('jsdom')
+
+const { JSDOM } = jsdom
 
 const YELP_URL = 'https://api.yelp.com/v3'
 const { API_KEY } = process.env
@@ -14,84 +18,34 @@ const getBusinesses = (req, res) => {
       limit: 3,
     },
   })
-    .then((yelpBusinessesResponse) => {
-      getReviews(req, res, yelpBusinessesResponse.data.businesses)
+    .then((businessesResponse) => {
+      getReviews(req, res, businessesResponse.data.businesses)
     })
     .catch((err) => {
       console.log('err', err)
     })
 }
 
-getReviews = (req, res, businesses) => {
-  const GetReviewsPromises = []
-  const ReviewResponses = []
+const getReviews = (req, res, businesses) => {
+  const reviews = {}
 
-  axios.get(`${YELP_URL}/businesses/${businesses[0].id}/reviews`, {
+  Promise.all(businesses.map((business, index) => axios.get(business.url, {
     headers: { Authorization: `${API_KEY}` },
   })
-    .then((response1) => {
-      for (const review of response1.data.reviews) {
-        ReviewResponses.push(review);
-      }
-    })
-    .then(() => axios.get(`${YELP_URL}/businesses/${businesses[1].id}/reviews`, {
-      headers: { Authorization: `${API_KEY}` },
-    }))
-    .then((response2) => {
-      for (const review of response2.data.reviews) {
-        ReviewResponses.push(review);
-      }
-    })
-    .then(() => axios.get(`${YELP_URL}/businesses/${businesses[2].id}/reviews`, {
-      headers: { Authorization: `${API_KEY}` },
-    }))
-    .then((response3) => {
-      for (const review of response3.data.reviews) {
-        ReviewResponses.push(review);
-      }
+    .then((reviewsResponse) => {
+      const dom = new JSDOM(reviewsResponse.data)
+      const rating = Number(dom.window.document.getElementById('reviews').querySelector('.five-stars--regular__09f24__DgBNj').attributes['aria-label'].textContent.substring(0, 1))
+      const reviewText = dom.window.document.getElementById('reviews').querySelector('.comment__09f24__gu0rG').textContent
+      reviews[index] = { rating, reviewText }
+    })))
+    .then(() => {
+      console.log('data to be sent:', { reviews, businesses })
+      res.status(200).send({ reviews, businesses })
     })
     .catch((err) => {
-      console.log(err);
+      console.log('err:', err)
     })
-    .then(() => {
-      sendReviews(req, res, businesses, ReviewResponses);
-    });
-};
+}
 
-sendReviews = (req, res, businesses, reviews) => {
-  // console.log('reviews:', reviews)
-  const response = {
-    businesses,
-    reviews,
-  };
-
-  res.status(200).send(response);
-};
-
-module.exports.getBusinesses = getBusinesses;
-module.exports.getReviews = getReviews;
-module.exports.sendReviews = sendReviews;
-
-// Promise.all(businesses.map(business => {
-//   console.log('business.id', business.id)
-//   return
-//     axios.get(`${YELP_URL}/businesses/${business.id}/reviews`, {
-//       headers: {'Authorization': `${API_KEY}`}
-//     })
-//     .then(response => {
-//       console.log('getRevResp:', response)
-//       // return response
-//       // ReviewResponses[business.name] = response['reviews']
-//       // console.log('ReviewResponses[business.name]:', ReviewResponses[business.name])
-//     })
-//     .catch(err => console.log('error getting reviews:', err))
-// }))
-// // Promise.all(GetReviewsPromises)
-// .then((values) => {
-//   console.log('GetReviewsPromises values:', values)
-//   return values
-//   // sendReviews(req, res, GetReviewsPromises)
-// })
-// .catch(err => {
-//   console.log('err', err)
-// })
+module.exports.getBusinesses = getBusinesses
+module.exports.getReviews = getReviews
