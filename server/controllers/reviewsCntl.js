@@ -1,7 +1,5 @@
-/* eslint-disable max-len */
 /* eslint-disable no-use-before-define */
 const axios = require('axios')
-// const reviewsModel = require('../models/reviewsModel')
 const jsdom = require('jsdom')
 
 const { JSDOM } = jsdom
@@ -35,13 +33,15 @@ async function getReviews(req, res, businesses) {
   }))
 
   const responses = await Promise.allSettled(getReviewsRequest)
+  console.log('businesses response:', businesses)
+  console.log('getReviewsRequest response:', responses)
 
   const fulfilled = responses.filter((result) => result.status === 'fulfilled')
   const rejected = responses.filter((result) => result.status === 'rejected')
   console.log('rejected:', rejected)
 
   const reviews = []
-  if (fulfilled.length > 0) {
+  if (fulfilled.length) {
     fulfilled.forEach((reviewsResponse) => {
       const dom = new JSDOM(reviewsResponse.value.data)
       const rating1 = Number(dom.window.document.getElementById('reviews').querySelectorAll('.five-stars--regular__09f24__DgBNj')[0].attributes['aria-label'].textContent.substring(0, 1))
@@ -63,33 +63,6 @@ async function getReviews(req, res, businesses) {
     res.sendStatus(500)
   }
 }
-
-// const getReviews = (req, res, businesses) => {
-//   const reviews = []
-
-//   Promise.allSettled(businesses.map((business) => axios.get(business.url, {
-//     headers: { Authorization: `${API_KEY}` },
-//   })
-//     .then((reviewsResponse) => {
-//       const dom = new JSDOM(reviewsResponse.data)
-//       const rating1 = Number(dom.window.document.getElementById('reviews').querySelectorAll('.five-stars--regular__09f24__DgBNj')[0].attributes['aria-label'].textContent.substring(0, 1))
-//       const rating2 = Number(dom.window.document.getElementById('reviews').querySelectorAll('.five-stars--regular__09f24__DgBNj')[1].attributes['aria-label'].textContent.substring(0, 1))
-//       const reviewText1 = dom.window.document.getElementById('reviews').querySelectorAll('.comment__09f24__gu0rG')[0].textContent
-//       const reviewText2 = dom.window.document.getElementById('reviews').querySelectorAll('.comment__09f24__gu0rG')[1].textContent
-//       reviews.push(
-//         { rating: rating1, reviewText: reviewText1 },
-//         { rating: rating2, reviewText: reviewText2 },
-//       )
-//       console.log('reviews.length:', reviews.length)
-//     })))
-//     .then(() => {
-//       console.log('FINAL DATA TO BE SENT:', reviews, businesses)
-//       res.status(200).send({ reviews, businesses })
-//     })
-//     .catch((err) => {
-//       console.log('err:', err)
-//     })
-// }
 
 module.exports.getBusinesses = getBusinesses
 module.exports.getReviews = getReviews

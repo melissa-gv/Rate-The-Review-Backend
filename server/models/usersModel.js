@@ -1,67 +1,43 @@
-// const db = require("../database/index.js");
+const DB = require('../database/index')
 
-
-// exports.createOne = ({ title, content, summary, status, image_id }) => {
-//   var queryString = `INSERT INTO posts (title, content, summary, status, imageID) VALUES ('${title}', '${content}', '${summary}', '${status}', '${image_id}')`;
-//   return db.queryAsync(queryString)
-//   .then((queryResult) => {
-//     return queryResult
-//     console.log('DB Result from createOne:', queryResult)
-//   })
-//   .catch(err => {
-//     console.log('Error inserting into DB:', err)
-//   });
-//   // throw Error("Method not implemented")
-// };
-
-// exports.findAll = () => {
-//   var queryString = `SELECT * FROM posts ORDER BY created_at DESC`;
-//   return db.queryAsync(queryString).spread(results => results)
-//   .then((queryResult) => {
-//     console.log('DB Result from findAll:', queryResult)
-//     return queryResult
-//   })
-//   .catch(err => {
-//     console.log('Error finding into DB:', err)
-//   })
-// };
-
-// exports.findByID = (id) => {
-//   var queryString = `SELECT * FROM posts WHERE id = '${id}'`;
-//   return db.queryAsync(queryString).spread(results => results)
-//   .then((queryResult) => {
-//     console.log('DB Result from findByID:', queryResult)
-//     return queryResult
-//   })
-//   .catch(err => {
-//     console.log('Error finding into DB:', err)
-//   })
-// };
-
-// exports.incrementViewByID = (id) => {
-
-//   // TODO: Implement this method.
-//   // Update the function's arguments if you'd like to switch
-//   // to a callback-based implementation.
-//   throw Error("Method not implemented")
-// };
-
-// exports.toggleStatusByID = (id) => {
-
-//   // TODO: Implement this method.
-//   // Update the function's arguments if you'd like to switch
-//   // to a callback-based implementation.
-//   throw Error("Method not implemented")
-// };
-
-// exports.deleteByID = (id) => {
-
-//   // TODO: Implement this method.
-//   // Update the function's arguments if you'd like to switch
-//   // to a callback-based implementation.
-//   throw Error("Method not implemented")
-// };
-
-// exports.deleteAll = () => {
-//   return db.queryAsync(`TRUNCATE posts`).catch((err) => console.log(err));
-// };
+module.exports = {
+  upsertUser: (user) => {
+    const filter = { username: user.username }
+    const update = user
+    return DB.UserModel.findOneAndUpdate(filter, update, {
+      new: true,
+      upsert: true,
+    })
+  },
+  addGameEntryMdl: (gameData) => {
+    const filter = { username: gameData.username }
+    const update = {
+      zipcode: gameData.zipcode,
+      score: gameData.score,
+      restaurants: gameData.restaurants,
+    }
+    return DB.UserModel.findOneAndUpdate(filter, { $push: { games: update } }, {
+      new: true,
+      upsert: true,
+    })
+  },
+  // eslint-disable-next-line arrow-body-style
+  getTopScoresMdl: () => {
+    return DB.UserModel.aggregate([
+      {
+        $project: {
+          _id: 0,
+          username: 1,
+          'games._id': 1,
+          'games.score': 1,
+          'games.date': 1,
+          'games.restaurants.name': 1,
+        },
+      },
+      { $unwind: '$games' },
+      { $unwind: '$games.score' },
+      { $sort: { 'games.score': -1 } },
+      { $limit: 10 },
+    ])
+  },
+}

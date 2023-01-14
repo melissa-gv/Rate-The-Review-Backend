@@ -1,27 +1,37 @@
-const axios = require('axios').default;
-const Post = require("../models/reviewsModel.js");
+const USERS_MODEL = require('../models/usersModel')
 
-exports.getPosts = (req, res) => {
-  Post.findAll()
-  .then((dbResponse) => {
-    console.log('findAll DB response:', dbResponse)
-    res.send(dbResponse)
-  })
-  .catch(err => {
-    console.log('err in DB findAll:', err)
-    res.sendStatus(501)
-  })
-};
-
-exports.getPost = (req, res) => {
-  console.log('getPost data:', req.params.id)
-  Post.findByID(req.params.id)
-  .then((dbResponse) => {
-    console.log('findByID DB response:', dbResponse)
-    res.send(dbResponse)
-  })
-  .catch(err => {
-    console.log('err in DB findByID:', err)
-    res.sendStatus(501)
-  })
-};
+module.exports = {
+  upsertUserCntl: (req, res) => {
+    console.log('req.body.params:', req.body.params)
+    return USERS_MODEL.upsertUser(req.body.params)
+      .then((response) => {
+        console.log('upsertUserCntl response:', response)
+        res.status(201).send(response)
+      })
+      .catch((err) => {
+        console.log(err)
+        res.sendStatus(500)
+      })
+  },
+  addGameEntry: (req, res) => {
+    console.log('req.body.params:', req.body.params)
+    return USERS_MODEL.addGameEntryMdl(req.body.params)
+      .then((response) => {
+        console.log('addGameEntryMdl response:', response)
+        res.status(201).send(response)
+      })
+      .catch((err) => {
+        console.log(err)
+        res.sendStatus(500)
+      })
+  },
+  getTopScoresCntl: (req, res) => USERS_MODEL.getTopScoresMdl()
+    .then((response) => {
+      console.log('getTopScoresMdl response:', response)
+      res.status(201).send(response)
+    })
+    .catch((err) => {
+      console.log(err)
+      res.sendStatus(500)
+    }),
+}

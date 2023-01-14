@@ -5,21 +5,42 @@ const app = express()
 const path = require('path')
 const cors = require('cors')
 
-app.use(cors())
+app.use(
+  cors({
+    credentials: true,
+    origin: 'http://localhost:5173',
+    optionsSuccessStatus: 200,
+  }),
+)
 
-// eslint-disable-next-line prefer-destructuring
-// const PORT = process.env.PORT
-const PORT = 3000
-const reviewsCntl = require('./controllers/reviewsCntl')
+const cookieParser = require('cookie-parser')
+
+const { PORT } = process.env
+const REVIEWS_CNTL = require('./controllers/reviewsCntl')
+const USERS_CNTL = require('./controllers/usersCntl')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(cookieParser())
 
 app.get('/businesses', (req, res) => {
-  console.log('server request received!')
-  reviewsCntl.getBusinesses(req, res)
+  console.log('Businesses server request received!')
+  REVIEWS_CNTL.getBusinesses(req, res)
+})
+
+app.put('/auth', (req, res) => {
+  USERS_CNTL.upsertUserCntl(req, res)
+  // res.cookie('rate-the-review-cookie', 'adfdsafasdfasdfsadf').send('cookie set')
+  // console.log('req.cookies:', req.cookies)
+})
+
+app.put('/results', (req, res) => {
+  USERS_CNTL.addGameEntry(req, res)
+})
+
+app.get('/allUsers', (req, res) => {
+  USERS_CNTL.getTopScoresCntl(req, res)
 })
 
 app.listen(PORT, () => {
