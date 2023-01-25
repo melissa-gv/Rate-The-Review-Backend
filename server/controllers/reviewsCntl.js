@@ -4,8 +4,7 @@ const jsdom = require('jsdom')
 
 const { JSDOM } = jsdom
 
-const YELP_URL = 'https://api.yelp.com/v3'
-const { API_KEY } = process.env
+const { YELP_URL, API_KEY } = process.env
 
 const getBusinesses = (req, res) => {
   const offsetNum = Math.floor(Math.random() * 1000)

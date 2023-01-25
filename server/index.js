@@ -39,7 +39,9 @@ app.put('/results', (req, res) => {
   USERS_CNTL.addGameEntry(req, res)
 })
 
+// FIXME change path name
 app.get('/allUsers', (req, res) => {
+  console.log('Get all users server request received!')
   USERS_CNTL.getTopScoresCntl(req, res)
 })
 
