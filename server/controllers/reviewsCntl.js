@@ -7,7 +7,7 @@ const { JSDOM } = jsdom
 const { YELP_URL, API_KEY } = process.env
 
 const getBusinesses = (req, res) => {
-  const offsetNum = Math.floor(Math.random() * 1000)
+  const offsetNum = Math.floor(Math.random() * 300)
   axios.get(`${YELP_URL}/businesses/search`, {
     headers: { Authorization: `${API_KEY}` },
     params: {

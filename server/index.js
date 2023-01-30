@@ -29,7 +29,7 @@ app.get('/businesses', (req, res) => {
   REVIEWS_CNTL.getBusinesses(req, res)
 })
 
-app.put('/auth', (req, res) => {
+app.post('/auth', (req, res) => {
   USERS_CNTL.upsertUserCntl(req, res)
   // res.cookie('rate-the-review-cookie', 'adfdsafasdfasdfsadf').send('cookie set')
   // console.log('req.cookies:', req.cookies)
@@ -40,8 +40,7 @@ app.put('/results', (req, res) => {
 })
 
 // FIXME change path name
-app.get('/allUsers', (req, res) => {
-  console.log('Get all users server request received!')
+app.get('/getTopScores', (req, res) => {
   USERS_CNTL.getTopScoresCntl(req, res)
 })
 
