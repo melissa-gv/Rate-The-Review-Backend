@@ -5,24 +5,14 @@ const app = express()
 const path = require('path')
 const cors = require('cors')
 
-app.use(
-  cors({
-    credentials: true,
-    origin: 'http://localhost:5173',
-    optionsSuccessStatus: 200,
-  }),
-)
-
-const cookieParser = require('cookie-parser')
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static(path.join(__dirname, 'public')))
 
 const { PORT } = process.env
 const REVIEWS_CNTL = require('./controllers/reviewsCntl')
 const USERS_CNTL = require('./controllers/usersCntl')
-
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.static(path.join(__dirname, 'public')))
-app.use(cookieParser())
 
 app.get('/businesses', (req, res) => {
   console.log('Businesses server request received!')
@@ -30,17 +20,20 @@ app.get('/businesses', (req, res) => {
 })
 
 app.post('/auth', (req, res) => {
+  console.log('auth server request received!')
   USERS_CNTL.upsertUserCntl(req, res)
   // res.cookie('rate-the-review-cookie', 'adfdsafasdfasdfsadf').send('cookie set')
   // console.log('req.cookies:', req.cookies)
 })
 
 app.put('/results', (req, res) => {
+  console.log('game results server request received!')
   USERS_CNTL.addGameEntry(req, res)
 })
 
 // FIXME change path name
 app.get('/getTopScores', (req, res) => {
+  console.log('getTopScores server request received!')
   USERS_CNTL.getTopScoresCntl(req, res)
 })
 
