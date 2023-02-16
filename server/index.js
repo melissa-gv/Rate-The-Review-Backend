@@ -5,7 +5,14 @@ const app = express()
 const path = require('path')
 const cors = require('cors')
 
-app.use(cors())
+app.use(
+  cors({
+    // credentials: true,
+    // origin: 'http://ec2-54-153-69-63.us-west-1.compute.amazonaws.com',
+    origin: false,
+    optionsSuccessStatus: 200,
+  }),
+)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
@@ -13,6 +20,11 @@ app.use(express.static(path.join(__dirname, 'public')))
 const { PORT } = process.env
 const REVIEWS_CNTL = require('./controllers/reviewsCntl')
 const USERS_CNTL = require('./controllers/usersCntl')
+
+app.get('/test', (req, res) => {
+  console.log('test server request received!')
+  res.send('test endpoint reached')
+})
 
 app.get('/businesses', (req, res) => {
   console.log('Businesses server request received!')
@@ -22,8 +34,6 @@ app.get('/businesses', (req, res) => {
 app.post('/auth', (req, res) => {
   console.log('auth server request received!')
   USERS_CNTL.upsertUserCntl(req, res)
-  // res.cookie('rate-the-review-cookie', 'adfdsafasdfasdfsadf').send('cookie set')
-  // console.log('req.cookies:', req.cookies)
 })
 
 app.put('/results', (req, res) => {
