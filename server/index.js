@@ -36,7 +36,7 @@ app.post('/auth', (req, res) => {
   USERS_CNTL.upsertUserCntl(req, res)
 })
 
-app.put('/results', (req, res) => {
+app.post('/results', (req, res) => {
   console.log('game results server request received!')
   USERS_CNTL.addGameEntry(req, res)
 })
