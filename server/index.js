@@ -3,16 +3,15 @@ const express = require('express')
 
 const app = express()
 const path = require('path')
-const cors = require('cors')
+// const cors = require('cors')
 
-app.use(
-  cors({
-    // credentials: true,
-    // origin: 'http://ec2-54-153-69-63.us-west-1.compute.amazonaws.com',
-    origin: false,
-    optionsSuccessStatus: 200,
-  }),
-)
+app.use()
+  // cors({
+  //   // credentials: true,
+  //   // origin: 'http://ec2-54-153-69-63.us-west-1.compute.amazonaws.com',
+  //   origin: false,
+  //   optionsSuccessStatus: 200,
+  // }),)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
