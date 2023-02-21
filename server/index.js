@@ -6,7 +6,7 @@ const path = require('path')
 const cors = require('cors')
 
 const corsOptions = {
-  origin: ['http://playratethereview.com', 'http://www.playratethereview.com'],
+  origin: ['http://playratethereview.com', 'http://www.playratethereview.com', 'http://localhost:5173'],
   optionsSuccessStatus: 200,
 }
 
@@ -30,7 +30,7 @@ app.get('/businesses', (req, res) => {
 })
 
 app.post('/auth', (req, res) => {
-  console.log('auth server request received!')
+  // console.log('auth server request received!')
   USERS_CNTL.upsertUserCntl(req, res)
 })
 

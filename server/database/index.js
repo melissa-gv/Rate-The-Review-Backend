@@ -14,7 +14,7 @@ const GAME_SCHEMA = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  zipcode: Number,
+  location: String,
   score: Number,
   restaurants: Array,
 

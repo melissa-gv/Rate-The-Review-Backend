@@ -5,7 +5,6 @@ module.exports = {
     console.log('req.body.params:', req.body.params)
     return USERS_MODEL.upsertUser(req.body.params)
       .then((response) => {
-        console.log('upsertUserCntl response:', response)
         res.status(201).send(response)
       })
       .catch((err) => {

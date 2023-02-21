@@ -7,9 +7,9 @@ const { JSDOM } = jsdom
 const { YELP_URL, API_KEY } = process.env
 
 const getBusinesses = (req, res) => {
-  const offsetNum = Math.floor(Math.random() * 300)
+  const offsetNum = Math.floor(Math.random() * 100)
   axios.get(`${YELP_URL}/businesses/search`, {
-    headers: { Authorization: `${API_KEY}` },
+    headers: { Authorization: API_KEY },
     params: {
       term: 'restaurants',
       location: req.query.location,
@@ -21,19 +21,17 @@ const getBusinesses = (req, res) => {
     .then((businessesResponse) => {
       getReviews(req, res, businessesResponse.data.businesses)
     })
-    .catch((err) => {
-      console.log('err', err)
+    .catch(() => {
+      res.sendStatus(500)
     })
 }
 
 async function getReviews(req, res, businesses) {
   const getReviewsRequest = businesses.map((business) => axios.get(business.url, {
-    headers: { Authorization: `${API_KEY}` },
+    headers: { Authorization: API_KEY },
   }))
 
   const responses = await Promise.allSettled(getReviewsRequest)
-  console.log('businesses response:', businesses)
-  console.log('getReviewsRequest response:', responses)
 
   const fulfilled = responses.filter((result) => result.status === 'fulfilled')
   const rejected = responses.filter((result) => result.status === 'rejected')
