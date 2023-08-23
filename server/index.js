@@ -26,7 +26,7 @@ app.get('/test', (req, res) => {
 
 app.get('/businesses', (req, res) => {
   console.log('Businesses server request received!')
-  REVIEWS_CNTL.getBusinesses(req, res)
+  REVIEWS_CNTL.getBusinessesandReviews(req, res)
 })
 
 app.post('/auth', (req, res) => {
